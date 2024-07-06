@@ -1,25 +1,25 @@
-# 🎈 Streamlit + LLM Examples App
+# 🎈 IEC 61499 AI Assistant
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://ubiquitous-waddle-vpw54647w79hjx5.github.dev/)
 
-Starter examples for building LLM apps with Streamlit.
 
-## Overview of the App
+## Overview of the IEC 61499 AI Assistant 
 
-This app showcases a growing collection of LLM minimum working examples.
+This application showcases a growing collection of LLM powered IEC 61499 control systems.
 
 Current examples include:
 
-- Chatbot
-- File Q&A
-- Chat with Internet search
-- LangChain Quickstart
-- LangChain PromptTemplate
-- Chat with user feedback
+- IEC 61499 AI Assistant
+- IEC 61499 Solution Q&A
+- IEC 61499 SQL Chatbot
+- IEC 61499 ML Agent
+- IEC 61499 FB Genereator Assistant
+- IEC 61499 Graph DB Chatbot
+- IEC 61499 AI Skill Executer
 
 ## Demo App
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://llm-examples.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://iec61499.streamlit.app/)
 
 ### Get an OpenAI API key
 
