@@ -36,7 +36,7 @@ if authentication_status == True:
         st.chat_message(msg["role"]).write(msg["content"])
 
     if db_uri:
-        agent = create_custom_sql_agent(db_uri)
+        agent = create_custom_sql_agent(f"postgresql+psycopg2://postgres:postgres@130.240.196.40:5432/HotWaterTank")
 
     if prompt := st.chat_input():
         if not db_uri:
