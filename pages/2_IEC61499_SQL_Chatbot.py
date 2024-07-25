@@ -1,48 +1,54 @@
 import streamlit as st
+import pickle
+from pathlib import Path
+import streamlit_authenticator as stauth  # pip install streamlit-authenticator
+from SQL.sql_agent import create_custom_sql_agent
+from langchain_core.messages import HumanMessage
+    
 
-from langchain.agents import initialize_agent, AgentType
-from langchain.callbacks import StreamlitCallbackHandler
-from langchain.chat_models import ChatOpenAI
-from langchain.tools import DuckDuckGoSearchRun
+# --- USER AUTHENTICATION ---
+names = ["Midhun Xavier", "Sandeep Patil", "Valeriy Vyatkin"]
+usernames = ["MX", "SP", "VV"]
 
-with st.sidebar:
-    openai_api_key = st.text_input(
-        "OpenAI API Key", key="langchain_search_api_key_openai", type="password"
-    )
-    "[Get an OpenAI API key](https://platform.openai.com/account/api-keys)"
-    "[View the source code](https://github.com/streamlit/llm-examples/blob/main/pages/2_Chat_with_search.py)"
-    "[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/streamlit/llm-examples?quickstart=1)"
+# load hashed passwords
+file_path = Path(__file__).parent / "../Authentication/hashed_pw.pkl"
+with file_path.open("rb") as file:
+    hashed_passwords = pickle.load(file)
 
-st.title("🔎 LangChain - Chat with search")
+authenticator = stauth.Authenticate(names, usernames, hashed_passwords, "QA_dashboard", "abcdef", cookie_expiry_days=30)
 
-"""
-In this example, we're using `StreamlitCallbackHandler` to display the thoughts and actions of an agent in an interactive Streamlit app.
-Try more LangChain 🤝 Streamlit Agent examples at [github.com/langchain-ai/streamlit-agent](https://github.com/langchain-ai/streamlit-agent).
-"""
+name, authentication_status, username = authenticator.login("Login", "main")
 
-if "messages" not in st.session_state:
-    st.session_state["messages"] = [
-        {"role": "assistant", "content": "Hi, I'm a chatbot who can search the web. How can I help you?"}
-    ]
+if authentication_status == False:
+    st.error("Username/password is incorrect")
 
-for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+if authentication_status == None:
+    st.warning("Please enter your username and password")
 
-if prompt := st.chat_input(placeholder="Who won the Women's U.S. Open in 2018?"):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    st.chat_message("user").write(prompt)
+if authentication_status == True:
+    st.title("📝 IEC 61499 Solution Q&A with AI")
+    with st.sidebar:
+        db_uri = st.text_input("Database connection string", key="db_uri", type="password")
+        "example : postgresql+psycopg2://postgres:postgres@localhost:5432/HotWaterTank"
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+    for msg in st.session_state.messages:
+        st.chat_message(msg["role"]).write(msg["content"])
 
-    if not openai_api_key:
-        st.info("Please add your OpenAI API key to continue.")
-        st.stop()
+    if db_uri:
+        agent = create_custom_sql_agent(db_uri)
 
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=openai_api_key, streaming=True)
-    search = DuckDuckGoSearchRun(name="Search")
-    search_agent = initialize_agent(
-        [search], llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, handle_parsing_errors=True
-    )
-    with st.chat_message("assistant"):
-        st_cb = StreamlitCallbackHandler(st.container(), expand_new_thoughts=False)
-        response = search_agent.run(st.session_state.messages, callbacks=[st_cb])
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        st.write(response)
+    if prompt := st.chat_input():
+        if not db_uri:
+                st.info("Please add your IEC 61499 Application Database connection string")
+                st.stop()
+        
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.chat_message("user").write(prompt)
+
+    
+
+        response =  agent.invoke({"input": prompt})
+            
+        st.session_state.messages.append({"role": "assistant", "content": response['output']})
+        st.chat_message("assistant").write(response['output'])
