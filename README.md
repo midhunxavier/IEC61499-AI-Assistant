@@ -13,8 +13,8 @@ Current examples include:
 - IEC 61499 Solution Q&A
 - IEC 61499 SQL Chatbot
 - IEC 61499 Data Visualizer
-- IEC 61499 FB Genereator Assistant
-- IEC 61499 Test FB Generator Assistant
+- IEC 61499 FB Genereator 
+- IEC 61499 Test FB Generator 
   
 ## Demo App
 
