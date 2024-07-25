@@ -9,7 +9,7 @@ This application showcases a growing collection of LLM powered IEC 61499 control
 
 Current examples include:
 
-- IEC 61499 AI Assistant
+## IEC 61499 AI Assistants
 - IEC 61499 Solution Q&A
 - IEC 61499 SQL Chatbot
 - IEC 61499 Data Visualizer
