@@ -2,9 +2,9 @@ import streamlit as st
 import pickle
 from pathlib import Path
 import streamlit_authenticator as stauth  # pip install streamlit-authenticator
-from SQL.sql_agent import create_custom_sql_agent
+from SQL.graph_builder import create_sql_graph
 from langchain_core.messages import HumanMessage
-    
+
 
 # --- USER AUTHENTICATION ---
 names = ["Midhun Xavier", "Sandeep Patil", "Valeriy Vyatkin"]
@@ -36,7 +36,7 @@ if authentication_status == True:
         st.chat_message(msg["role"]).write(msg["content"])
 
     if db_uri:
-        agent = create_custom_sql_agent(f"{db_uri}")
+        graph = create_sql_graph()
 
     if prompt := st.chat_input():
         if not db_uri:
@@ -48,7 +48,7 @@ if authentication_status == True:
 
     
 
-        response =  agent.invoke({"input": prompt})
+        response =  graph.invoke({"messages": [HumanMessage(content=prompt)]},config={"configurable": {"thread_id": 42}})
             
         st.session_state.messages.append({"role": "assistant", "content": response['output']})
         st.chat_message("assistant").write(response['output'])
