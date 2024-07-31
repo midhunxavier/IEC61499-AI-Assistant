@@ -65,3 +65,4 @@ def create_sql_graph():
     graph_builder.add_edge("db_query_tool", "search_query_info")
     graph_builder.set_entry_point("search_proper_names")
     graph = graph_builder.compile(checkpointer=memory)
+    return graph
