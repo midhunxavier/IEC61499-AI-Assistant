@@ -48,7 +48,7 @@ if authentication_status == True:
 
     
 
-        response =  graph.invoke({"messages": [HumanMessage(content=prompt)]},config={"configurable": {"thread_id": 42}})
+        response =  graph.invoke({"messages": [HumanMessage(content=prompt)]},config={"configurable": {"thread_id": 45}})
             
         st.session_state.messages.append({"role": "assistant", "content": response["messages"][-1].content})
         st.chat_message("assistant").write(response["messages"][-1].content)

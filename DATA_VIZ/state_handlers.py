@@ -13,6 +13,7 @@ from DATA_VIZ.tools import (
 
 from typing import List, TypedDict, Optional, Annotated, Dict
 from langgraph.graph.message import AnyMessage, add_messages
+from langgraph.prebuilt import create_react_agent
 
 
 class SqlInfoState(TypedDict):
@@ -32,6 +33,12 @@ def should_continue_search_variable_info(state: SqlInfoState) -> Literal["get_va
         return "get_variable_details_tool"
     return "search_table_info"
 
+def should_continue_search_table_info(state: SqlInfoState) -> Literal["get_relevant_table_schema_tool", "search_query_info"]:
+    last_message = state["messages"][-1]
+    if last_message.tool_calls:
+        return "get_relevant_table_schema_tool"
+    return "search_query_info"
+    
 def should_continue_search_query_info(state: SqlInfoState) -> Literal["db_query_tool", "draw_chart"]:
     last_message = state["messages"][-1]
     if last_message.tool_calls:
@@ -140,16 +147,12 @@ def search_query_info(state: SqlInfoState):
         return {"messages": [{"role": "ai", "content":  "error occurred"}]}
         
 
-system = """ You may generate safe python code to analyze data and generate charts using matplotlib.
+system = """ 
+            You may generate safe python code to analyze data and generate charts using matplotlib and save image as "temp.png".
+            Finally summarise the whole result for the question and try to show data in tabular columns.
          """
 system_prompt = ChatPromptTemplate.from_messages(
-    [("system", system), ("placeholder", "{messages}")]
+    [("system", system), ("placeholder", "{messages}"), ("placeholder", "{agent_scratchpad}")]
 )
-draw_chart_model = system_prompt | ChatOpenAI(model="gpt-4o", temperature=0).bind_tools([python_repl_tool])
-
-def draw_chart(state: SqlInfoState):
-    response =draw_chart_model.invoke({"messages": state["messages"]})
-    if response:
-        return {"messages": [response]}
-    else:
-        return {"messages": [{"role": "ai", "content":  "error occurred"}]}
+tools = [python_repl_tool]
+draw_agent = create_react_agent(ChatOpenAI(model="gpt-4o-mini", temperature=0), tools, state_modifier=system_prompt)

@@ -2,9 +2,9 @@ import streamlit as st
 import pickle
 from pathlib import Path
 import streamlit_authenticator as stauth  # pip install streamlit-authenticator
-from SQL.graph_builder import create_sql_graph
+from DATA_VIZ.graph_builder import create_sql_graph
 from langchain_core.messages import HumanMessage
-
+import os
 
 # --- USER AUTHENTICATION ---
 names = ["Midhun Xavier", "Sandeep Patil", "Valeriy Vyatkin"]
@@ -38,6 +38,8 @@ if authentication_status == True:
     if db_uri:
         graph = create_sql_graph()
 
+    if os.path.exists("temp.png"):
+        os.remove("temp.png")
     if prompt := st.chat_input():
         if not db_uri:
                 st.info("Please add your IEC 61499 Application Database connection string")
@@ -46,9 +48,12 @@ if authentication_status == True:
         st.session_state.messages.append({"role": "user", "content": prompt})
         st.chat_message("user").write(prompt)
 
-    
+
+        
 
         response =  graph.invoke({"messages": [HumanMessage(content=prompt)]},config={"configurable": {"thread_id": 42}})
             
         st.session_state.messages.append({"role": "assistant", "content": response["messages"][-1].content})
         st.chat_message("assistant").write(response["messages"][-1].content)
+        if os.path.exists("temp.png"):
+            st.image("temp.png") 

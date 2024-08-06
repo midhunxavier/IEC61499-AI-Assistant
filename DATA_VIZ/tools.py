@@ -14,9 +14,24 @@ from langchain_openai import ChatOpenAI
 
 
 from langchain_experimental.tools import PythonREPLTool
-python_repl_tool = PythonREPLTool()
+repl = PythonREPLTool()
 
 db = SQLDatabase.from_uri("postgresql+psycopg2://postgres:postgres@localhost:5432/HotWaterTank")
+
+
+from langchain_experimental.tools import PythonREPLTool
+repl = PythonREPLTool()
+
+
+@tool
+def python_repl_tool(code: str) -> str:
+    """Use this to execute python code and say plotted the graph"""
+    try:
+        result = repl.run(code)
+    except BaseException as e:
+        return {"messages": [{"role": "ai", "content":f"Failed to execute. Error: {repr(e)}" }]}
+    return {"messages": [{"role": "ai", "content":result }]}
+
 
 
 def create_tool_node_with_fallback(tools: list) -> RunnableWithFallbacks[Any, dict]:
