@@ -1,4 +1,3 @@
-
 from langchain_community.utilities import SQLDatabase
 from typing import Any
 from langchain_core.messages import ToolMessage
@@ -11,8 +10,6 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.tools import tool
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_openai import ChatOpenAI
-
-
 
 
 db = SQLDatabase.from_uri("postgresql+psycopg2://postgres:postgres@localhost:5432/HotWaterTank")
@@ -60,7 +57,7 @@ def search_proper_names_tool(query: str) -> str:
         result = retriever.invoke(query)
         return result
     except Exception as e:
-        return {"messages": [{"role": "ai", "content":  f"Error: {e}"}]}
+        return "Error: Cannot find the proper noun."
     
 
 @tool
@@ -76,12 +73,12 @@ def get_variable_details_tool(variable_name: str) -> str:
     query = """ SELECT "Path", "InstanceId", "IOType" FROM public."ArchiveInstances" WHERE "Path" LIKE '%{0}%';""".format(variable_name)
     result = db.run_no_throw(query)
     if not result:
-        return { "messages": [{"role": "ai", "content":  "Cannot retrieve the variable information"}]}
+        return  "Error: Cannot retrieve the variable information"
     else:
         return result
 
 
-toolkit = SQLDatabaseToolkit(db=db, llm=ChatOpenAI(model="gpt-4o"))
+toolkit = SQLDatabaseToolkit(db=db, llm=ChatOpenAI(model="gpt-4o-mini"))
 tools = toolkit.get_tools()
 get_schema_tool = next(tool for tool in tools if tool.name == "sql_db_schema")
 
@@ -96,7 +93,7 @@ def get_relevant_table_schema_tool(ioType: str) -> str:
         table_schema = get_schema_tool.invoke(TableName)
         return table_schema
     except Exception as e:
-        return {"messages": [{"role": "ai", "content":  f"Error: {e}"}]}
+        return "Error: Cannot find the relevant table schema."
     
 
 @tool
@@ -108,6 +105,5 @@ def db_query_tool(query: str) -> str:
     """
     result = db.run_no_throw(query)
     if not result:
-        return {"messages": [{"role": "ai", "content":  "Query failed. Please rewrite your query and try again."}]}
+        return "Error: Query failed. Please rewrite your query and try again."
     return  result
-

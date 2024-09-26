@@ -27,17 +27,7 @@ def should_continue_search_proper_names(state: SqlInfoState) -> Literal["search_
         return "__end__"
     return "search_variable_info"
 
-def should_continue_search_variable_info(state: SqlInfoState) -> Literal["get_variable_details_tool", "search_table_info"]:
-    last_message = state["messages"][-1]
-    if last_message.tool_calls:
-        return "get_variable_details_tool"
-    return "search_table_info"
 
-def should_continue_search_table_info(state: SqlInfoState) -> Literal["get_relevant_table_schema_tool", "search_query_info"]:
-    last_message = state["messages"][-1]
-    if last_message.tool_calls:
-        return "get_relevant_table_schema_tool"
-    return "search_query_info"
     
 def should_continue_search_query_info(state: SqlInfoState) -> Literal["db_query_tool", "draw_chart"]:
     last_message = state["messages"][-1]
@@ -45,11 +35,6 @@ def should_continue_search_query_info(state: SqlInfoState) -> Literal["db_query_
         return "db_query_tool"
     return "draw_chart"
 
-def should_continue_draw_chart(state: SqlInfoState) -> Literal["python_repl_tool", "__end__"]:
-    last_message = state["messages"][-1]
-    if last_message.tool_calls:
-        return "python_repl_tool"
-    return "__end__"
 
 
 system = """  You are an expert in identifying the different variable names from the user question. 
@@ -62,7 +47,7 @@ system = """  You are an expert in identifying the different variable names from
 system_prompt = ChatPromptTemplate.from_messages(
     [("system", system), ("placeholder", "{messages}")]
 )
-search_proper_names_model = system_prompt | ChatOpenAI(model="gpt-4o", temperature=0).bind_tools([search_proper_names_tool])
+search_proper_names_model = system_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0).bind_tools([search_proper_names_tool])
 
 def search_proper_names(state: SqlInfoState):
     response =search_proper_names_model.invoke({"messages": state["messages"]})
@@ -79,7 +64,7 @@ system = """  You are an expert in identifying the different  variable's details
 system_prompt = ChatPromptTemplate.from_messages(
     [("system", system), ("placeholder", "{messages}")]
 )
-search_variable_info_model = system_prompt | ChatOpenAI(model="gpt-4o", temperature=0).bind_tools([get_variable_details_tool])
+search_variable_info_model = system_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0).bind_tools([get_variable_details_tool])
 
 def search_variable_info(state: SqlInfoState):
     response =search_variable_info_model.invoke({"messages": state["messages"]})
@@ -96,7 +81,7 @@ system = """  You are an expert in identifying the different  variable's table s
 system_prompt = ChatPromptTemplate.from_messages(
     [("system", system), ("placeholder", "{messages}")]
 )
-search_table_info_model = system_prompt | ChatOpenAI(model="gpt-4o", temperature=0).bind_tools([get_relevant_table_schema_tool])
+search_table_info_model = system_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0).bind_tools([get_relevant_table_schema_tool])
 
 def search_table_info(state: SqlInfoState):
     response =search_table_info_model.invoke({"messages": state["messages"]})
@@ -137,7 +122,7 @@ Once identified the query then execute the query using execute_query tool to get
 query_gen_prompt = ChatPromptTemplate.from_messages(
     [("system", query_gen_system), ("placeholder", "{messages}")]
 )
-query_gen_model = query_gen_prompt | ChatOpenAI(model="gpt-4o", temperature=0).bind_tools([db_query_tool])
+query_gen_model = query_gen_prompt | ChatOpenAI(model="gpt-4o-mini", temperature=0).bind_tools([db_query_tool])
 
 def search_query_info(state: SqlInfoState):
     response =query_gen_model.invoke({"messages": state["messages"]})

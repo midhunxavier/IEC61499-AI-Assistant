@@ -1,0 +1,5 @@
+1.  can you find the pressure at which tank rupture on this hot water tank application?
+
+2. what all are the Function block present in this application?
+
+3. explain input, output and ecc of overpressure fb?

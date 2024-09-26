@@ -1,0 +1,5 @@
+1. find the 10 latest values of water level slider
+
+2. find the latest five values of water temperature
+
+3. whether the water tank is ruptured now?

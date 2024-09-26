@@ -97,7 +97,7 @@ def get_variable_details_tool(variable_name: str) -> str:
         return result
 
 
-toolkit = SQLDatabaseToolkit(db=db, llm=ChatOpenAI(model="gpt-4o"))
+toolkit = SQLDatabaseToolkit(db=db, llm=ChatOpenAI(model="gpt-4o-mini"))
 tools = toolkit.get_tools()
 get_schema_tool = next(tool for tool in tools if tool.name == "sql_db_schema")
 
