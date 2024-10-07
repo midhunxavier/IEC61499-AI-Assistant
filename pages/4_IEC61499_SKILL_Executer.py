@@ -24,7 +24,7 @@ if authentication_status == None:
     st_skill.warning("Please enter your username and password")
 
 if authentication_status == True:
-    st_skill.title("📝 IEC 61499 SKILL EXEECUTER AI ASSISTANT")
+    st_skill.title("📝 IEC 61499 SKILL EXECUTER AI ASSISTANT")
     if "messages" not in st_skill.session_state:
         st_skill.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
     for msg in st_skill.session_state.messages:
@@ -35,9 +35,6 @@ if authentication_status == True:
     if prompt := st_skill.chat_input():
         st_skill.session_state.messages.append({"role": "user", "content": prompt})
         st_skill.chat_message("user").write(prompt)
-
-    
-
 
 
         for event in workflow.stream({"messages": ("user", prompt)}):

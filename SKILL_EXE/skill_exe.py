@@ -5,6 +5,8 @@ from langchain_openai import ChatOpenAI
 from langgraph.graph import MessagesState, START, StateGraph
 from langgraph.prebuilt import tools_condition, ToolNode
 from langchain_core.messages import HumanMessage, SystemMessage
+#from langgraph.checkpoint.memory import MemorySaver
+#memory = MemorySaver()
 
 current_state = {
     1: "IDLE",
@@ -200,6 +202,7 @@ def set_react_skill_graph():
         tools_condition,
     )
     builder.add_edge("tools", "assistant")
+    #react_graph = builder.compile(checkpointer=memory,interrupt_before=["tools"],)
     react_graph = builder.compile()
 
     return react_graph
